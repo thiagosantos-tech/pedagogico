@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EREF Iva Ferreira - Gestão Pedagógica</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #f1f5f9; }
+        .sidebar { background: #1e3a8a; }
+        .nav-btn { color: rgba(255,255,255,0.65); transition: all 0.2s; border-radius: 10px; }
+        .nav-btn:hover { background: rgba(255,255,255,0.08); color: white; }
+        .nav-btn.active { background: white; color: #1e3a8a; font-weight: 700; }
+        .nav-btn.active svg { color: #f59e0b; }
+        .animate-in { animation: fadeUp 0.3s ease-out; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        .line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.bar-fill { transition: width 0.6s ease; }
+
+        /* ── LOGIN ── */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        #login-screen {
+            position: fixed; inset: 0;
+            z-index: 999;
+            display: flex;
+            align-items: stretch;
+            background: #0f172a;
+        }
+        #login-screen.hidden { display: none; }
+
+        .login-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2.5rem;
+            background: #0f172a;
+            position: relative;
+            overflow: hidden;
+        }
+        .login-left::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+            top: -150px; left: -150px;
+            pointer-events: none;
+        }
+        .login-left::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(251,191,36,0.08) 0%, transparent 70%);
+            bottom: -100px; right: -100px;
+            pointer-events: none;
+        }
+        .login-right {
+            width: 480px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3.5rem 3rem;
+        }
+        .login-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+            background: #f8fafc;
+            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+        }
+        .login-input:focus { border-color: #1e3a8a; background: white; box-shadow: 0 0 0 3px rgba(30,58,138,0.08); }
+        .login-input-wrap { position: relative; }
+        .login-input-icon {
+            position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%);
+            color: #94a3b8; width: 16px; height: 16px; pointer-events: none;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            letter-spacing: 0.01em;
+        }
+        .login-btn:hover { background: #1e40af; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(30,58,138,0.35); }
+        .login-btn:active { transform: translateY(0); }
+
+        .login-decorative-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+        .login-stat {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .login-stat:last-child { border-bottom: none; }
+        .login-stat-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .login-right { animation: fadeInRight 0.5s ease-out; }
+        .login-left-content { animation: fadeInLeft 0.5s ease-out; }
+
+        @media (max-width: 768px) {
+            #login-screen { flex-direction: column; }
+            .login-left { display: none; }
+            .login-right { width: 100%; padding: 2rem 1.5rem; }
+        }
+        /* ── MOBILE ── */
+        .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:49; }
+        .sidebar-overlay.open { display:block; }
+        .hamburger { display:none; }
+
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; }
+            aside {
+                position: fixed !important;
+                top: 0; left: 0; bottom: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 50;
+                height: 100vh !important;
+            }
+            aside.open { transform: translateX(0); }
+            .hamburger {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 6px;
+                color: #1e3a8a;
+                border-radius: 8px;
+            }
+            .hamburger:hover { background: #f1f5f9; }
+            #view-content { padding-bottom: 2rem; }
+            .mobile-px { padding-left: 1rem !important; padding-right: 1rem !important; }
+            .overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            table { min-width: 500px; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+
+    <!-- LADO ESQUERDO: apresentação -->
+    <div class="login-left">
+        <div class="login-left-content" style="max-width:380px; width:100%; position:relative; z-index:1;">
+
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:3rem;">
+                <div style="background:#1e3a8a;border:2px solid rgba(255,255,255,0.15);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                    <span style="color:#fbbf24;font-weight:900;font-size:1.2rem;line-height:1;">I</span>
+                </div>
+                <div>
+                    <p style="color:white;font-weight:800;font-size:0.95rem;line-height:1.2;">EREF Iva Ferreira</p>
+                    <p style="color:rgba(148,163,184,1);font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Gestão Pedagógica</p>
+                </div>
+            </div>
+
+            <h1 style="color:white;font-size:2.4rem;font-weight:800;line-height:1.15;margin-bottom:1rem;">
+                Sistema de<br><span style="color:#fbbf24;">Coordenação</span><br>Escolar
+            </h1>
+            <p style="color:rgba(148,163,184,1);font-size:0.95rem;line-height:1.7;margin-bottom:2.5rem;">
+                Plataforma centralizada para gestão de alunos, ocorrências, diário da coordenação e relatórios pedagógicos.
+            </p>
+
+            <div class="login-decorative-card">
+                <div class="login-stat">
+                    <div class="login-stat-icon" style="background:rgba(59,130,246,0.15);">📚</div>
+                    <div>
+                        <p style="color:white;font-size:0.85rem;font-weight:700;">Gestão de Alunos</p>
+                        <p style="color:rgba(148,163,184,0.8);font-size:0.75rem;">Cadastros, turmas e registros</p>
+                    </div>
+                </div>
+                <div class="login-stat">
+                    <div class="login-stat-icon" style="background:rgba(251,191,36,0.12);">📋</div>
+                    <div>
+                        <p style="color:white;font-size:0.85rem;font-weight:700;">Ocorrências e Diário</p>
+                        <p style="color:rgba(148,163,184,0.8);font-size:0.75rem;">Alunos, professores e coordenação</p>
+                    </div>
+                </div>
+                <div class="login-stat">
+                    <div class="login-stat-icon" style="background:rgba(16,185,129,0.12);">📊</div>
+                    <div>
+                        <p style="color:white;font-size:0.85rem;font-weight:700;">Relatórios em PDF</p>
+                        <p style="color:rgba(148,163,184,0.8);font-size:0.75rem;">Exportação e acompanhamento</p>
+                    </div>
+                </div>
+            </div>
+
+            <p style="color:rgba(100,116,139,1);font-size:0.72rem;margin-top:2rem;text-align:center;">
+                © 2026 EREF Iva Ferreira · Acesso restrito
+            </p>
+        </div>
+    </div>
+
+    <!-- LADO DIREITO: formulário -->
+    <div class="login-right">
+        <div style="width:100%;max-width:340px;">
+
+            <div style="margin-bottom:2.5rem;">
+                <div style="width:52px;height:52px;background:#eff6ff;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <h2 style="font-size:1.6rem;font-weight:800;color:#0f172a;margin-bottom:0.35rem;">Bem-vindo!</h2>
+                <p style="color:#64748b;font-size:0.9rem;">Insira suas credenciais para acessar o sistema.</p>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+                <div>
+                    <label style="display:block;font-size:0.75rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Usuário</label>
+                    <div class="login-input-wrap">
+                        <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <input type="text" id="login-user" class="login-input" placeholder="seu.usuario" autocomplete="username">
+                    </div>
+                </div>
+                <div>
+                    <label style="display:block;font-size:0.75rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Senha</label>
+                    <div class="login-input-wrap">
+                        <svg class="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="password" id="login-pass" class="login-input" placeholder="••••••••••" autocomplete="current-password">
+                    </div>
+                </div>
+
+                <p class="hidden text-red-500 text-sm font-semibold" id="login-error" style="display:none;background:#fef2f2;color:#dc2626;padding:0.65rem 1rem;border-radius:10px;font-size:0.82rem;font-weight:600;border:1px solid #fecaca;">
+                    ⚠️ Usuário ou senha incorretos.
+                </p>
+
+                <button class="login-btn" onclick="fazerLogin()" style="margin-top:0.5rem;">
+                    Entrar no Sistema →
+                </button>
+            </div>
+
+            <p style="text-align:center;color:#cbd5e1;font-size:0.75rem;margin-top:2rem;">
+                Sistema restrito · Acesso apenas para coordenadores
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+
+
+<div id="app-loading" class="fixed inset-0 flex items-center justify-center bg-white z-[100]">
+    <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-800 mx-auto mb-4"></div>
+        <p class="text-slate-500 text-sm font-medium">Carregando sistema...</p>
+    </div>
+</div>
+
+<div id="main-app" class="hidden min-h-screen flex">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar w-64 flex flex-col sticky top-0 h-screen shrink-0">
+        <div class="px-6 py-7 flex items-center gap-3 border-b border-white/10">
+            <div class="bg-yellow-400 w-9 h-9 rounded-xl flex items-center justify-center text-blue-900 font-black text-base shadow">I</div>
+            <div>
+                <p class="text-white font-black text-sm leading-tight">Iva Ferreira</p>
+                <p class="text-blue-200 text-[10px] font-semibold uppercase tracking-widest opacity-70">Gestão Pedagógica</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <p class="text-[9px] font-black uppercase tracking-widest text-blue-300 opacity-50 px-3 mb-2">Menu Principal</p>
+            <button onclick="navigateTo('dashboard')" data-path="dashboard" class="nav-btn flex items-center gap-3 w-full px-3 py-2.5 text-sm font-semibold">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+            </button>
+            <button onclick="navigateTo('alunos')" data-path="alunos" class="nav-btn flex items-center gap-3 w-full px-3 py-2.5 text-sm font-semibold">
+                <i data-lucide="users" class="w-4 h-4"></i> Alunos
+            </button>
+            <button onclick="navigateTo('ocorrencias-alunos')" data-path="ocorrencias-alunos" class="nav-btn flex items-center gap-3 w-full px-3 py-2.5 text-sm font-semibold">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i> Ocorr. – Alunos
+            </button>
+            <button onclick="navigateTo('ocorrencias-professores')" data-path="ocorrencias-professores" class="nav-btn flex items-center gap-3 w-full px-3 py-2.5 text-sm font-semibold">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i> Ocorr. – Professores
+            </button>
+            <button onclick="navigateTo('diario')" data-path="diario" class="nav-btn flex items-center gap-3 w-full px-3 py-2.5 text-sm font-semibold">
+                <i data-lucide="book-open" class="w-4 h-4"></i> Diário da Coordenação
+            </button>
+            <button onclick="navigateTo('saida-antecipada')" data-path="saida-antecipada" class="nav-btn flex items-center gap-3 w-full px-3 py-2.5 text-sm font-semibold">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Saída Antecipada
+            </button>
+            <button onclick="navigateTo('relatorios')" data-path="relatorios" class="nav-btn flex items-center gap-3 w-full px-3 py-2.5 text-sm font-semibold">
+                <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Relatórios
+            </button>
+        </nav>
+
+        <div class="px-4 pb-5">
+            <div class="bg-white/10 rounded-2xl p-3 flex items-center gap-3">
+                <img id="user-photo" class="w-9 h-9 rounded-full border-2 border-white/30">
+                <div class="overflow-hidden">
+                    <p id="user-name" class="text-xs font-black text-white truncate"></p>
+                    <p class="text-[9px] font-bold text-blue-200 uppercase tracking-widest opacity-70">Coordenador(a)</p>
+                </div>
+            </div>
+            <button onclick="fazerLogout()" class="w-full mt-2 flex items-center gap-2 px-3 py-2 text-xs font-bold text-red-300 hover:text-red-200 hover:bg-red-900/20 rounded-xl transition">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sair do Sistema
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 overflow-y-auto">
+        <header class="h-16 bg-white border-b border-slate-200 sticky top-0 z-40 flex items-center px-4 md:px-8 gap-3 shadow-sm">
+            <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="relative flex-1 max-w-md">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4"></i>
+                <input type="text" placeholder="Buscar aluno ou registro..." class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-blue-200 outline-none transition">
+            </div>
+            <div class="flex items-center gap-3 ml-auto">
+                <span id="header-date" class="text-xs font-semibold text-slate-400"></span>
+                <div class="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center">
+                    <i data-lucide="bell" class="w-4 h-4 text-white"></i>
+                </div>
+            </div>
+        </header>
+        <div id="view-content" class="pb-12"></div>
+    </main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, doc, collection, addDoc, query, orderBy, getDocs, limit, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    projectId: "gen-lang-client-0113178044",
+    appId: "1:360412491290:web:f8ed86bc3e74be7f092ba3",
+    apiKey: "AIzaSyAurwNOe20E-ky9ThRMy3lGspdlJdH3XfY",
+    authDomain: "gen-lang-client-0113178044.firebaseapp.com",
+    firestoreDatabaseId: "ai-studio-c78956be-56e7-4b63-a053-09dc58b9de00",
+    storageBucket: "gen-lang-client-0113178044.firebasestorage.app",
+    messagingSenderId: "360412491290"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+
+const TURMAS = ["6A","6B","7A","7B","8A","8B","8C","9A","9B","9C"];
+
+let currentView = 'dashboard';
+let currentUser = { uid:'public-user', displayName:'Coordenador', photoURL:'https://ui-avatars.com/api/?name=Coordenador&background=1e3a8a&color=fff' };
+let filterBuffers = {
+    ocorrenciasAlunos: { name:'', gravity:'', class:'' },
+    ocorrenciasProfessores: { name:'', gravity:'' }
+};
+
+const vc = document.getElementById('view-content');
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('app-loading').classList.add('hidden');
+    document.getElementById('header-date').textContent = new Date().toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'}).toUpperCase();
+
+    const sessao = sessionStorage.getItem('pedagogico_session');
+    if (sessao) {
+        try {
+            currentUser = JSON.parse(sessao);
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('user-name').textContent = currentUser.displayName;
+            document.getElementById('user-photo').src = currentUser.photoURL;
+            navigateTo('dashboard');
+        } catch(e) {}
+    }
+    // login-screen fica visível por padrão quando não há sessão
+    lucide.createIcons();
+});
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+window.navigateTo = (view) => {
+    currentView = view;
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.path === view);
+    });
+    renderView();
+};
+
+async function renderView() {
+    vc.innerHTML = '<div class="flex justify-center py-20"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-800"></div></div>';
+    try {
+        switch(currentView) {
+            case 'dashboard': await renderDashboard(); break;
+            case 'alunos': await renderAlunos(); break;
+            case 'ocorrencias-alunos': await renderOcorrenciasAlunos(); break;
+            case 'ocorrencias-professores': await renderOcorrenciasProfessores(); break;
+            case 'diario': await renderDiario(); break;
+            case 'saida-antecipada': await renderSaidaAntecipada(); break;
+            case 'relatorios': renderRelatorios(); break;
+        }
+        lucide.createIcons();
+    } catch(err) {
+        console.error(err);
+        vc.innerHTML = '<div class="p-8 text-red-500 font-bold">Erro ao carregar: ' + err.message + '</div>';
+    }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+window.openModal = (id) => document.getElementById(id)?.classList.remove('hidden');
+window.closeModal = (id) => document.getElementById(id)?.classList.add('hidden');
+
+function gravBadge(s) {
+    const map = { 'Grave':'bg-red-100 text-red-700', 'Média':'bg-amber-100 text-amber-700', 'Leve':'bg-blue-100 text-blue-700' };
+    return `<span class="${map[s]||'bg-slate-100 text-slate-600'} px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">${s}</span>`;
+}
+
+function pageHeader(title, subtitle, actions='') {
+    return `<div class="flex flex-wrap justify-between items-start gap-4 mb-8">
+        <div><h1 class="text-2xl font-black text-slate-800 tracking-tight">${title}</h1><p class="text-slate-400 text-sm mt-0.5">${subtitle}</p></div>
+        <div class="flex gap-2 flex-wrap">${actions}</div>
+    </div>`;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function renderDashboard() {
+    const [snapA, snapOA, snapOP, snapSE] = await Promise.all([
+        getDocs(collection(db, "students")),
+        getDocs(collection(db, "occurrences")),
+        getDocs(collection(db, "teacher_occurrences")),
+        getDocs(collection(db, "early_exits"))
+    ]);
+
+    // Count per turma
+    const turmaCounts = {};
+    snapOA.docs.forEach(d => {
+        const t = d.data().studentGrade || 'Sem turma';
+        turmaCounts[t] = (turmaCounts[t] || 0) + 1;
+    });
+    snapOP.docs.forEach(d => {
+        const t = d.data().involvedClass || 'Sem turma';
+        turmaCounts[t] = (turmaCounts[t] || 0) + 1;
+    });
+
+    const ranking = Object.entries(turmaCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
+    const maxVal = ranking[0]?.[1] || 1;
+
+    const rankingHTML = ranking.length === 0
+        ? '<p class="text-slate-400 text-sm text-center py-6">Nenhuma ocorrência registrada ainda.</p>'
+        : ranking.map(([turma, count], i) => {
+            const pct = Math.round((count/maxVal)*100);
+            const colors = ['bg-blue-600','bg-blue-500','bg-blue-400','bg-slate-400','bg-slate-300'];
+            return `<div class="mb-3">
+                <div class="flex justify-between items-center mb-1">
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500">${i+1}</span>
+                        <span class="text-sm font-bold text-slate-700">Turma ${turma}</span>
+                    </div>
+                    <span class="text-sm font-black text-blue-800">${count}</span>
+                </div>
+                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full ${colors[i]} rounded-full bar-fill" style="width:${pct}%"></div>
+                </div>
+            </div>`;
+        }).join('');
+
+    vc.innerHTML = `<div class="px-4 md:px-8 pt-6 md:pt-8 animate-in">
+        <div class="mb-8">
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Painel de Controle</h1>
+            <p class="text-slate-400 text-sm mt-0.5">Resumo geral da EREF Iva Ferreira</p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 mb-6 md:mb-8">
+            <div onclick="navigateTo('alunos')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="bg-blue-50 p-2.5 rounded-xl group-hover:bg-blue-100 transition"><i data-lucide="users" class="text-blue-700 w-5 h-5"></i></div>
+                    <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">Estudantes</span>
+                </div>
+                <p class="text-4xl font-black text-slate-800 mb-1">${snapA.size}</p>
+                <p class="text-slate-400 text-sm font-medium">Total de alunos</p>
+            </div>
+            <div onclick="navigateTo('ocorrencias-alunos')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="bg-red-50 p-2.5 rounded-xl group-hover:bg-red-100 transition"><i data-lucide="alert-circle" class="text-red-600 w-5 h-5"></i></div>
+                    <span class="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-full">Alunos</span>
+                </div>
+                <p class="text-4xl font-black text-slate-800 mb-1">${snapOA.size}</p>
+                <p class="text-slate-400 text-sm font-medium">Ocorrências de alunos</p>
+            </div>
+            <div onclick="navigateTo('ocorrencias-professores')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="bg-amber-50 p-2.5 rounded-xl group-hover:bg-amber-100 transition"><i data-lucide="shield-alert" class="text-amber-600 w-5 h-5"></i></div>
+                    <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Professores</span>
+                </div>
+                <p class="text-4xl font-black text-slate-800 mb-1">${snapOP.size}</p>
+                <p class="text-slate-400 text-sm font-medium">Ocorrências de professores</p>
+            </div>
+            <div onclick="navigateTo('saida-antecipada')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="bg-emerald-50 p-2.5 rounded-xl group-hover:bg-emerald-100 transition"><i data-lucide="log-out" class="text-emerald-600 w-5 h-5"></i></div>
+                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Saídas</span>
+                </div>
+                <p class="text-4xl font-black text-slate-800 mb-1">${snapSE.size}</p>
+                <p class="text-slate-400 text-sm font-medium">Saídas antecipadas</p>
+            </div>
+        </div>
+
+        <!-- Ranking de Turmas -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <div class="flex items-center gap-2 mb-6">
+                <div class="bg-blue-50 p-2 rounded-lg"><i data-lucide="bar-chart-2" class="text-blue-700 w-4 h-4"></i></div>
+                <div>
+                    <h3 class="text-sm font-black text-slate-700 uppercase tracking-wide">Turmas com Mais Ocorrências</h3>
+                    <p class="text-xs text-slate-400">Ranking geral (alunos + professores)</p>
+                </div>
+            </div>
+            ${rankingHTML}
+        </div>
+    </div>`;
+    lucide.createIcons();
+}
+
+// ── ALUNOS ────────────────────────────────────────────────────────────────────
+async function renderAlunos() {
+    const snap = await getDocs(query(collection(db,"students"), orderBy("name")));
+    const students = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const turmaOpts = TURMAS.map(t => `<option value="${t}">${t}</option>`).join('');
+
+    vc.innerHTML = `<div class="px-4 md:px-8 pt-6 md:pt-8 animate-in">
+        ${pageHeader('Alunos','Gestão de estudantes da unidade.',
+            `<button onclick="openModal('modal-add-student')" class="bg-blue-800 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-blue-900 transition text-sm shadow-lg shadow-blue-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> Novo Aluno
+            </button>`
+        )}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead><tr class="bg-slate-50 border-b border-slate-100">
+                    <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-wider">Nome</th>
+                    <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-wider">Turma</th>
+                    <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-wider">Responsável</th>
+                    <th class="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-wider">Ações</th>
+                </tr></thead>
+                <tbody class="divide-y divide-slate-50">
+                    ${students.length === 0
+                        ? '<tr><td colspan="4" class="px-6 py-12 text-center text-slate-400">Nenhum aluno cadastrado.</td></tr>'
+                        : students.map(s => `<tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-black text-sm">${s.name.charAt(0)}</div>
+                                    <span class="font-semibold text-slate-800">${s.name}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4"><span class="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-full">${s.grade}</span></td>
+                            <td class="px-6 py-4 text-slate-500 text-sm">${s.responsible||'-'}</td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="deleteStudent('${s.id}')" class="text-slate-300 hover:text-red-500 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </td>
+                        </tr>`).join('')}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-add-student" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl">
+            <h3 class="text-xl font-black text-slate-800 mb-6">Cadastrar Novo Aluno</h3>
+            <form onsubmit="saveStudent(event)" class="space-y-4">
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nome Completo</label>
+                <input type="text" name="name" required class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Turma</label>
+                <select name="grade" required class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none bg-white text-sm">
+                    <option value="">Selecione...</option>${turmaOpts}</select></div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Responsável</label>
+                <input type="text" name="responsible" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Telefone</label>
+                <input type="text" name="phone" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm" placeholder="(00) 00000-0000"></div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-student')" class="flex-1 p-3 bg-slate-100 rounded-xl font-bold text-slate-600 text-sm">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-blue-800 text-white rounded-xl font-bold hover:bg-blue-900 transition text-sm">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>`;
+    lucide.createIcons();
+}
+
+window.saveStudent = async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled=true; btn.textContent='Salvando...';
+    const fd = new FormData(e.target);
+    try {
+        await addDoc(collection(db,"students"), { name:fd.get('name'), grade:fd.get('grade'), responsible:fd.get('responsible')||'', phone:fd.get('phone')||'', createdAt:serverTimestamp() });
+        closeModal('modal-add-student');
+        renderAlunos();
+    } catch(err) { alert(err.message); }
+    finally { btn.disabled=false; btn.textContent='Salvar'; }
+};
+
+window.deleteStudent = async (id) => {
+    if(!confirm("Remover este aluno?")) return;
+    await deleteDoc(doc(db,"students",id));
+    renderAlunos();
+};
+
+// ── OCORRÊNCIAS ALUNOS ────────────────────────────────────────────────────────
+async function renderOcorrenciasAlunos() {
+    const snapS = await getDocs(query(collection(db,"students"), orderBy("name")));
+    const students = snapS.docs.map(d => ({id:d.id,...d.data()}));
+
+    const snap = await getDocs(query(collection(db,"occurrences"), orderBy("date","desc")));
+    let occs = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+    const f = filterBuffers.ocorrenciasAlunos;
+    if(f.name) occs = occs.filter(o => (o.studentName||'').toLowerCase().includes(f.name.toLowerCase()));
+    if(f.gravity) occs = occs.filter(o => o.severity === f.gravity);
+    if(f.class) occs = occs.filter(o => o.studentGrade === f.class);
+
+    const turmaOpts = TURMAS.map(t => `<option value="${t}">${t}</option>`).join('');
+    const studentOpts = students.map(s => `<option value="${s.id}|${s.name}|${s.grade||''}">${s.name}${s.grade?' ('+s.grade+')':''}</option>`).join('');
+
+    const cards = occs.length === 0
+        ? '<div class="bg-white p-12 text-center text-slate-400 rounded-2xl border border-slate-200">Nenhuma ocorrência encontrada.</div>'
+        : occs.map(o => `
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                <div class="flex gap-4 items-start">
+                    <div class="h-11 w-11 ${o.severity==='Grave'?'bg-red-50 text-red-500':'bg-amber-50 text-amber-500'} rounded-xl flex items-center justify-center shrink-0">
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start gap-2 mb-1">
+                            <div>
+                                <h3 class="font-black text-slate-800">${o.studentName||'Aluno não identificado'}</h3>
+                                <span class="text-xs text-slate-400 font-semibold">${o.studentGrade||'Turma não informada'}</span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-xs text-slate-400">${o.date?new Date(o.date+'T12:00:00').toLocaleDateString('pt-BR'):'-'}</span>
+                                <button onclick="deleteOccurrence('${o.id}','occurrences')" class="text-slate-200 hover:text-red-500 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 text-sm my-3 leading-relaxed">${o.description}</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${gravBadge(o.severity)}
+                            ${o.actionTaken?`<span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-bold">Prov: ${o.actionTaken}</span>`:''}
+                        </div>
+                    </div>
+                </div>
+            </div>`).join('');
+
+    vc.innerHTML = `<div class="px-4 md:px-8 pt-6 md:pt-8 animate-in">
+        ${pageHeader('Ocorrências – Alunos','Controle disciplinar do corpo discente.',
+            `<button onclick="exportOcorrenciasAlunosPDF_Filtrado()" class="bg-white border border-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-50 transition text-sm">
+                <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
+            </button>
+            <button onclick="openModal('modal-add-occurrence')" class="bg-blue-800 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-blue-900 transition text-sm shadow-lg shadow-blue-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> Nova Ocorrência
+            </button>`
+        )}
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-3 mb-6">
+            <input type="text" id="f-o-name" value="${f.name}" placeholder="Buscar por aluno..." oninput="updateOAFilter()" class="flex-1 min-w-[180px] bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200">
+            <select id="f-o-class" onchange="updateOAFilter()" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200">
+                <option value="">Todas as turmas</option>${turmaOpts}
+            </select>
+            <select id="f-o-grav" onchange="updateOAFilter()" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200">
+                <option value="">Todas as gravidades</option>
+                <option value="Leve" ${f.gravity==='Leve'?'selected':''}>Leve</option>
+                <option value="Média" ${f.gravity==='Média'?'selected':''}>Média</option>
+                <option value="Grave" ${f.gravity==='Grave'?'selected':''}>Grave</option>
+            </select>
+            <button onclick="clearOAFilter()" class="px-3 py-2 text-xs font-bold text-slate-500 bg-slate-100 rounded-xl hover:bg-slate-200 transition">Limpar</button>
+        </div>
+
+        <div class="space-y-3">${cards}</div>
+    </div>
+
+    <div id="modal-add-occurrence" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-black text-slate-800 mb-6">Nova Ocorrência – Aluno</h3>
+            <form onsubmit="saveOccurrence(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Aluno</label>
+                    <select name="studentData" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none bg-white text-sm">
+                        <option value="|Digite abaixo|">✏️ Digitar nome manualmente</option>
+                        ${studentOpts}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ou digite o nome diretamente</label>
+                    <input type="text" name="studentNameManual" placeholder="Nome do aluno (se não cadastrado)" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Turma</label>
+                    <select name="gradeManual" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none bg-white text-sm">
+                        <option value="">Selecione...</option>${turmaOpts}
+                    </select></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Data</label>
+                    <input type="date" name="date" required value="${new Date().toISOString().split('T')[0]}" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                </div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Descrição</label>
+                <textarea name="description" required rows="3" placeholder="Descreva o ocorrido..." class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></textarea></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Gravidade</label>
+                    <select name="severity" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none bg-white text-sm">
+                        <option>Leve</option><option>Média</option><option>Grave</option>
+                    </select></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Providência</label>
+                    <input type="text" name="actionTaken" placeholder="Ex: Ligação aos pais" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-occurrence')" class="flex-1 p-3 bg-slate-100 rounded-xl font-bold text-slate-600 text-sm">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-blue-800 text-white rounded-xl font-bold hover:bg-blue-900 transition text-sm">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>`;
+
+    // Restore filter values
+    if(f.class) document.getElementById('f-o-class').value = f.class;
+    lucide.createIcons();
+}
+
+window.updateOAFilter = () => {
+    filterBuffers.ocorrenciasAlunos.name = document.getElementById('f-o-name')?.value||'';
+    filterBuffers.ocorrenciasAlunos.gravity = document.getElementById('f-o-grav')?.value||'';
+    filterBuffers.ocorrenciasAlunos.class = document.getElementById('f-o-class')?.value||'';
+    renderOcorrenciasAlunos();
+};
+window.clearOAFilter = () => { filterBuffers.ocorrenciasAlunos={name:'',gravity:'',class:''}; renderOcorrenciasAlunos(); };
+
+window.saveOccurrence = async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled=true; btn.textContent='Salvando...';
+    const fd = new FormData(e.target);
+    const rawData = fd.get('studentData')||'';
+    const [sId, sName, sGrade] = rawData.split('|');
+    const manualName = fd.get('studentNameManual')||'';
+    const manualGrade = fd.get('gradeManual')||'';
+    const finalName = manualName || sName || 'Não identificado';
+    const finalGrade = manualGrade || sGrade || '';
+    const data = {
+        studentId: sId||'manual', studentName: finalName, studentGrade: finalGrade,
+        date: fd.get('date'), description: fd.get('description'),
+        severity: fd.get('severity')||'Leve', actionTaken: fd.get('actionTaken')||'',
+        createdAt: serverTimestamp(), reportedBy: currentUser.displayName
+    };
+    try {
+        await addDoc(collection(db,"occurrences"), data);
+        closeModal('modal-add-occurrence');
+        renderOcorrenciasAlunos();
+    } catch(err) { alert(err.message); }
+    finally { btn.disabled=false; btn.textContent='Salvar'; }
+};
+
+// ── OCORRÊNCIAS PROFESSORES ───────────────────────────────────────────────────
+async function renderOcorrenciasProfessores() {
+    const snap = await getDocs(query(collection(db,"teacher_occurrences"), orderBy("date","desc")));
+    let occs = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+    const f = filterBuffers.ocorrenciasProfessores;
+    if(f.name) occs = occs.filter(o => (o.teacherName||'').toLowerCase().includes(f.name.toLowerCase()));
+    if(f.gravity) occs = occs.filter(o => o.severity === f.gravity);
+
+    const turmaOpts = TURMAS.map(t => `<option value="${t}">${t}</option>`).join('');
+
+    const cards = occs.length === 0
+        ? '<div class="bg-white p-12 text-center text-slate-400 rounded-2xl border border-slate-200">Nenhuma ocorrência encontrada.</div>'
+        : occs.map(o => `
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                <div class="flex gap-4 items-start">
+                    <div class="h-11 w-11 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                        <i data-lucide="user-cog" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start gap-2 mb-1">
+                            <div>
+                                <h3 class="font-black text-slate-800">${o.teacherName}</h3>
+                                <div class="flex gap-1 text-xs text-slate-400 font-semibold">
+                                    <span>${o.subject||''}</span>${o.subject&&o.involvedClass?'<span>•</span>':''}
+                                    <span>${o.involvedClass||''}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-xs text-slate-400">${o.date?new Date(o.date+'T12:00:00').toLocaleDateString('pt-BR'):'-'}</span>
+                                <button onclick="deleteOccurrence('${o.id}','teacher_occurrences')" class="text-slate-200 hover:text-red-500 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 text-sm my-3 leading-relaxed line-clamp-3">${o.description}</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${gravBadge(o.severity)}
+                            ${o.actionTaken?`<span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-bold">Prov: ${o.actionTaken}</span>`:''}
+                        </div>
+                    </div>
+                </div>
+            </div>`).join('');
+
+    vc.innerHTML = `<div class="px-4 md:px-8 pt-6 md:pt-8 animate-in">
+        ${pageHeader('Ocorrências – Professores','Gestão de ocorrências do corpo docente.',
+            `<button onclick="exportOcorrenciasProfessoresPDF_Filtrado()" class="bg-white border border-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-50 transition text-sm">
+                <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
+            </button>
+            <button onclick="openModal('modal-add-occurrence-teacher')" class="bg-amber-500 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-amber-600 transition text-sm shadow-lg shadow-amber-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> Nova Ocorrência
+            </button>`
+        )}
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-3 mb-6">
+            <input type="text" id="f-p-name" value="${f.name}" placeholder="Buscar por professor..." oninput="updateOPFilter()" class="flex-1 min-w-[200px] bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200">
+            <select id="f-p-grav" onchange="updateOPFilter()" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200">
+                <option value="">Todas as gravidades</option>
+                <option value="Leve" ${f.gravity==='Leve'?'selected':''}>Leve</option>
+                <option value="Média" ${f.gravity==='Média'?'selected':''}>Média</option>
+                <option value="Grave" ${f.gravity==='Grave'?'selected':''}>Grave</option>
+            </select>
+            <button onclick="clearOPFilter()" class="px-3 py-2 text-xs font-bold text-slate-500 bg-slate-100 rounded-xl hover:bg-slate-200 transition">Limpar</button>
+        </div>
+
+        <div class="space-y-3">${cards}</div>
+    </div>
+
+    <div id="modal-add-occurrence-teacher" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-black text-slate-800 mb-6">Nova Ocorrência – Professor</h3>
+            <form onsubmit="saveTeacherOccurrence(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nome do Professor</label>
+                    <input type="text" name="teacherName" required class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Disciplina</label>
+                    <input type="text" name="subject" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Turma Envolvida</label>
+                    <select name="involvedClass" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none bg-white text-sm">
+                        <option value="">Não se aplica</option>${turmaOpts}
+                    </select></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Data</label>
+                    <input type="date" name="date" required value="${new Date().toISOString().split('T')[0]}" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                </div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Descrição</label>
+                <textarea name="description" required rows="3" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></textarea></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Gravidade</label>
+                    <select name="severity" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none bg-white text-sm">
+                        <option>Leve</option><option>Média</option><option>Grave</option>
+                    </select></div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Providência</label>
+                    <input type="text" name="actionTaken" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-occurrence-teacher')" class="flex-1 p-3 bg-slate-100 rounded-xl font-bold text-slate-600 text-sm">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-blue-800 text-white rounded-xl font-bold hover:bg-blue-900 transition text-sm">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>`;
+    lucide.createIcons();
+}
+
+window.updateOPFilter = () => {
+    filterBuffers.ocorrenciasProfessores.name = document.getElementById('f-p-name')?.value||'';
+    filterBuffers.ocorrenciasProfessores.gravity = document.getElementById('f-p-grav')?.value||'';
+    renderOcorrenciasProfessores();
+};
+window.clearOPFilter = () => { filterBuffers.ocorrenciasProfessores={name:'',gravity:''}; renderOcorrenciasProfessores(); };
+
+window.saveTeacherOccurrence = async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled=true; btn.textContent='Salvando...';
+    const fd = new FormData(e.target);
+    try {
+        await addDoc(collection(db,"teacher_occurrences"), {
+            teacherName:fd.get('teacherName'), subject:fd.get('subject')||'',
+            involvedClass:fd.get('involvedClass')||'', date:fd.get('date'),
+            description:fd.get('description'), severity:fd.get('severity')||'Leve',
+            actionTaken:fd.get('actionTaken')||'', createdAt:serverTimestamp()
+        });
+        closeModal('modal-add-occurrence-teacher');
+        renderOcorrenciasProfessores();
+    } catch(err) { alert(err.message); }
+    finally { btn.disabled=false; btn.textContent='Salvar'; }
+};
+
+// ── DELETE OCCURRENCE ─────────────────────────────────────────────────────────
+window.deleteOccurrence = async (id, colName) => {
+    if(!confirm('Remover esta ocorrência? Esta ação não pode ser desfeita.')) return;
+    await deleteDoc(doc(db, colName, id));
+    colName === 'occurrences' ? renderOcorrenciasAlunos() : renderOcorrenciasProfessores();
+};
+
+// ── DIÁRIO ────────────────────────────────────────────────────────────────────
+async function renderDiario() {
+    const snap = await getDocs(query(collection(db,"diary"), orderBy("createdAt","desc"), limit(50)));
+    const entries = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+    vc.innerHTML = `<div class="px-4 md:px-8 pt-6 md:pt-8 animate-in">
+        ${pageHeader('Diário da Coordenação','Histórico de ações e atendimentos.',
+            `<button onclick="openModal('modal-add-diary')" class="bg-blue-800 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-blue-900 transition text-sm shadow-lg shadow-blue-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> Nova Entrada
+            </button>`
+        )}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            ${entries.length === 0
+                ? '<div class="col-span-full bg-white p-12 text-center text-slate-400 rounded-2xl border border-slate-200">Nenhum registro no diário.</div>'
+                : entries.map(e => `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                    <div class="flex justify-between mb-3">
+                        <span class="bg-blue-50 text-blue-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full">${e.tag||'Relato'}</span>
+                        <span class="text-slate-400 text-xs">${e.createdAt?.toDate().toLocaleString('pt-BR')||''}</span>
+                    </div>
+                    <h3 class="font-black text-slate-800 mb-2 truncate">${e.title}</h3>
+                    <p class="text-slate-500 text-sm line-clamp-3 mb-4">${e.content}</p>
+                    <div class="mt-auto pt-3 border-t border-slate-50 text-xs text-slate-400 font-medium">Por: ${e.authorName||'—'}</div>
+                </div>`).join('')}
+        </div>
+    </div>
+
+    <div id="modal-add-diary" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg p-8 shadow-2xl">
+            <h3 class="text-xl font-black text-slate-800 mb-6">Nova Entrada no Diário</h3>
+            <form onsubmit="saveDiary(event)" class="space-y-4">
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Título</label>
+                <input type="text" name="title" required class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Categoria</label>
+                <select name="tag" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none bg-white text-sm">
+                    <option>Atendimento Aluno</option><option>Reunião de Pais</option><option>Pauta Pedagógica</option><option>Observação Disciplinar</option>
+                </select></div>
+                <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Relato</label>
+                <textarea name="content" required rows="5" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-300 outline-none text-sm resize-none"></textarea></div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-diary')" class="flex-1 p-3 bg-slate-100 rounded-xl font-bold text-slate-600 text-sm">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-blue-800 text-white rounded-xl font-bold hover:bg-blue-900 transition text-sm">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>`;
+    lucide.createIcons();
+}
+
+window.saveDiary = async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled=true; btn.textContent='Salvando...';
+    const fd = new FormData(e.target);
+    try {
+        await addDoc(collection(db,"diary"), { title:fd.get('title'), tag:fd.get('tag'), content:fd.get('content'), authorName:currentUser.displayName, createdAt:serverTimestamp() });
+        closeModal('modal-add-diary');
+        renderDiario();
+    } catch(err) { alert(err.message); }
+    finally { btn.disabled=false; btn.textContent='Registrar'; }
+};
+
+// ── RELATÓRIOS ────────────────────────────────────────────────────────────────
+function renderRelatorios() {
+    vc.innerHTML = `<div class="px-4 md:px-8 pt-6 md:pt-8 animate-in">
+        ${pageHeader('Relatórios','Exportar dados em PDF.')}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div onclick="exportAlunosPDF()" class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-400 hover:shadow-md cursor-pointer text-center group transition">
+                <div class="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-800 transition">
+                    <i data-lucide="users" class="text-blue-700 group-hover:text-white w-7 h-7 transition"></i>
+                </div>
+                <h3 class="font-black text-slate-800 mb-1">Lista de Alunos</h3>
+                <p class="text-slate-400 text-xs">Exportar lista geral (PDF)</p>
+            </div>
+            <div onclick="navigateTo('ocorrencias-alunos')" class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:border-red-400 hover:shadow-md cursor-pointer text-center group transition">
+                <div class="bg-red-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-red-600 transition">
+                    <i data-lucide="alert-circle" class="text-red-600 group-hover:text-white w-7 h-7 transition"></i>
+                </div>
+                <h3 class="font-black text-slate-800 mb-1">Ocorrências – Alunos</h3>
+                <p class="text-slate-400 text-xs">Filtrar e baixar PDF</p>
+            </div>
+            <div onclick="navigateTo('ocorrencias-professores')" class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:border-amber-400 hover:shadow-md cursor-pointer text-center group transition">
+                <div class="bg-amber-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 transition">
+                    <i data-lucide="shield-alert" class="text-amber-600 group-hover:text-white w-7 h-7 transition"></i>
+                </div>
+                <h3 class="font-black text-slate-800 mb-1">Ocorrências – Professores</h3>
+                <p class="text-slate-400 text-xs">Filtrar e baixar PDF</p>
+            </div>
+        </div>
+    </div>`;
+    lucide.createIcons();
+}
+
+
+// ── SAÍDA ANTECIPADA ──────────────────────────────────────────────────────────
+async function renderSaidaAntecipada() {
+    const snapS = await getDocs(query(collection(db,"students"), orderBy("name")));
+    const students = snapS.docs.map(d => ({id:d.id,...d.data()}));
+
+    const snap = await getDocs(query(collection(db,"early_exits"), orderBy("date","desc")));
+    const saidas = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+    const turmaOpts = TURMAS.map(t => `<option value="${t}">${t}</option>`).join('');
+    const studentOpts = students.map(s => `<option value="${s.id}|${s.name}|${s.grade||''}">${s.name}${s.grade?' ('+s.grade+')':''}</option>`).join('');
+
+    const motivoColors = {
+        'Doença': 'bg-red-100 text-red-700',
+        'Consulta Médica': 'bg-blue-100 text-blue-700',
+        'Autorização dos Pais': 'bg-green-100 text-green-700',
+        'Emergência Familiar': 'bg-amber-100 text-amber-700',
+        'Outros': 'bg-slate-100 text-slate-600'
+    };
+
+    const cards = saidas.length === 0
+        ? '<div class="bg-white p-12 text-center text-slate-400 rounded-2xl border border-slate-200">Nenhuma saída registrada.</div>'
+        : saidas.map(s => `
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                <div class="flex gap-4 items-start">
+                    <div class="h-11 w-11 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start gap-2 mb-1">
+                            <div>
+                                <h3 class="font-black text-slate-800">${s.studentName}</h3>
+                                <span class="text-xs text-slate-400 font-semibold">${s.studentGrade||'Turma não informada'}</span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-xs text-slate-400 font-medium">${s.date?new Date(s.date+'T12:00:00').toLocaleDateString('pt-BR'):'-'}</span>
+                                <button onclick="deleteSaida('${s.id}')" class="text-slate-200 hover:text-red-500 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-2 mb-3">
+                            <span class="${motivoColors[s.motivo]||'bg-slate-100 text-slate-600'} px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">${s.motivo}</span>
+                            <span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-bold">
+                                🕐 Saída: ${s.horaSaida||'—'}
+                            </span>
+                            ${s.responsavel ? `<span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold">👤 ${s.responsavel}</span>` : ''}
+                        </div>
+                        ${s.observacao ? `<p class="text-slate-500 text-sm leading-relaxed">${s.observacao}</p>` : ''}
+                    </div>
+                </div>
+            </div>`).join('');
+
+    vc.innerHTML = `<div class="px-4 md:px-8 pt-6 md:pt-8 animate-in">
+        ${pageHeader('Saída Antecipada','Registro de alunos que saíram antes do horário previsto.',
+            `<button onclick="exportSaidaPDF()" class="bg-white border border-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-50 transition text-sm">
+                <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
+            </button>
+            <button onclick="openModal('modal-saida')" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-emerald-700 transition text-sm shadow-lg shadow-emerald-200">
+                <i data-lucide="plus" class="w-4 h-4"></i> Registrar Saída
+            </button>`
+        )}
+
+        <!-- Resumo do dia -->
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-6 flex items-center gap-4">
+            <div class="bg-emerald-100 p-2.5 rounded-xl">
+                <i data-lucide="calendar-check" class="text-emerald-600 w-5 h-5"></i>
+            </div>
+            <div>
+                <p class="text-sm font-black text-emerald-800">Total de saídas registradas: <span class="text-2xl">${saidas.length}</span></p>
+                <p class="text-xs text-emerald-600">Clique em "Registrar Saída" para adicionar um novo registro</p>
+            </div>
+        </div>
+
+        <div class="space-y-3">${cards}</div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal-saida" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-black text-slate-800 mb-6">Registrar Saída Antecipada</h3>
+            <form onsubmit="saveSaida(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Aluno</label>
+                    <select name="studentData" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-300 outline-none bg-white text-sm">
+                        <option value="|">✏️ Digitar nome abaixo</option>
+                        ${studentOpts}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ou digite o nome manualmente</label>
+                    <input type="text" name="studentNameManual" placeholder="Nome do aluno (se não cadastrado)" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-300 outline-none text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Turma</label>
+                        <select name="gradeManual" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-300 outline-none bg-white text-sm">
+                            <option value="">Selecione...</option>${turmaOpts}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Data</label>
+                        <input type="date" name="date" required value="${new Date().toISOString().split('T')[0]}" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-300 outline-none text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Hora da Saída</label>
+                        <input type="time" name="horaSaida" required class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-300 outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Motivo</label>
+                        <select name="motivo" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-300 outline-none bg-white text-sm">
+                            <option>Doença</option>
+                            <option>Consulta Médica</option>
+                            <option>Autorização dos Pais</option>
+                            <option>Emergência Familiar</option>
+                            <option>Outros</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Responsável que buscou</label>
+                    <input type="text" name="responsavel" placeholder="Nome do responsável" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-300 outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Observações</label>
+                    <textarea name="observacao" rows="2" placeholder="Informações adicionais..." class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-emerald-300 outline-none text-sm resize-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-saida')" class="flex-1 p-3 bg-slate-100 rounded-xl font-bold text-slate-600 text-sm">Cancelar</button>
+                    <button type="submit" class="flex-1 p-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition text-sm">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>`;
+    lucide.createIcons();
+}
+
+window.saveSaida = async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled=true; btn.textContent='Salvando...';
+    const fd = new FormData(e.target);
+    const rawData = fd.get('studentData')||'';
+    const [sId, sName, sGrade] = rawData.split('|');
+    const manualName = fd.get('studentNameManual')||'';
+    const manualGrade = fd.get('gradeManual')||'';
+    const finalName = manualName || sName || 'Não identificado';
+    const finalGrade = manualGrade || sGrade || '';
+    try {
+        await addDoc(collection(db,"early_exits"), {
+            studentId: sId||'manual',
+            studentName: finalName,
+            studentGrade: finalGrade,
+            date: fd.get('date'),
+            horaSaida: fd.get('horaSaida'),
+            motivo: fd.get('motivo')||'Outros',
+            responsavel: fd.get('responsavel')||'',
+            observacao: fd.get('observacao')||'',
+            registradoPor: currentUser.displayName,
+            createdAt: serverTimestamp()
+        });
+        closeModal('modal-saida');
+        renderSaidaAntecipada();
+    } catch(err) { alert(err.message); }
+    finally { btn.disabled=false; btn.textContent='Registrar'; }
+};
+
+window.deleteSaida = async (id) => {
+    if(!confirm('Remover este registro de saída?')) return;
+    await deleteDoc(doc(db,"early_exits",id));
+    renderSaidaAntecipada();
+};
+
+window.exportSaidaPDF = async () => {
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF();
+    const snap = await getDocs(query(collection(db,"early_exits"), orderBy("date","desc")));
+    const rows = snap.docs.map(d => {
+        const s = d.data();
+        return [s.studentName||'-', s.studentGrade||'-', s.date||'-', s.horaSaida||'-', s.motivo, s.responsavel||'-', s.observacao||'-'];
+    });
+    pdf.setFontSize(16); pdf.text("Saídas Antecipadas - EREF Iva Ferreira", 14, 20);
+    pdf.setFontSize(10); pdf.text("Total: " + rows.length + " | Gerado: " + new Date().toLocaleString('pt-BR'), 14, 28);
+    pdf.autoTable({
+        startY: 35,
+        head: [['Aluno','Turma','Data','Hora','Motivo','Responsável','Obs.']],
+        body: rows,
+        headStyles: { fillColor: [5,150,105] },
+        columnStyles: { 6: { cellWidth: 35 } }
+    });
+    pdf.save('saidas_antecipadas.pdf');
+};
+
+
+// ── PDF ───────────────────────────────────────────────────────────────────────
+window.exportAlunosPDF = async () => {
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF();
+    const snap = await getDocs(query(collection(db,"students"), orderBy("name")));
+    const rows = snap.docs.map(d => [d.data().name, d.data().grade, d.data().responsible||'-', d.data().phone||'-']);
+    pdf.setFontSize(16); pdf.text("Lista de Alunos - EREF Iva Ferreira", 14, 20);
+    pdf.setFontSize(10); pdf.text("Gerado em: " + new Date().toLocaleString('pt-BR'), 14, 28);
+    pdf.autoTable({ startY:35, head:[['Nome','Turma','Responsável','Telefone']], body:rows, headStyles:{fillColor:[30,58,138]} });
+    pdf.save('alunos.pdf');
+};
+
+window.exportOcorrenciasAlunosPDF_Filtrado = async () => {
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF();
+    const snap = await getDocs(query(collection(db,"occurrences"), orderBy("date","desc")));
+    let list = snap.docs.map(d => d.data());
+    const f = filterBuffers.ocorrenciasAlunos;
+    if(f.name) list = list.filter(o => (o.studentName||'').toLowerCase().includes(f.name.toLowerCase()));
+    if(f.gravity) list = list.filter(o => o.severity === f.gravity);
+    if(f.class) list = list.filter(o => o.studentGrade === f.class);
+    const rows = list.map(o => [o.studentName||'-', o.studentGrade||'-', o.date||'-', o.severity, o.description, o.actionTaken||'-']);
+    pdf.setFontSize(16); pdf.text("Ocorrências de Alunos - EREF Iva Ferreira", 14, 20);
+    pdf.setFontSize(10); pdf.text("Total: " + list.length + " | Gerado: " + new Date().toLocaleString('pt-BR'), 14, 28);
+    pdf.autoTable({ startY:35, head:[['Aluno','Turma','Data','Gravidade','Descrição','Providência']], body:rows, headStyles:{fillColor:[30,58,138]} });
+    pdf.save('ocorrencias_alunos.pdf');
+};
+
+window.exportOcorrenciasProfessoresPDF_Filtrado = async () => {
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF();
+    const snap = await getDocs(query(collection(db,"teacher_occurrences"), orderBy("date","desc")));
+    let list = snap.docs.map(d => d.data());
+    const f = filterBuffers.ocorrenciasProfessores;
+    if(f.name) list = list.filter(o => (o.teacherName||'').toLowerCase().includes(f.name.toLowerCase()));
+    if(f.gravity) list = list.filter(o => o.severity === f.gravity);
+    const rows = list.map(o => [o.teacherName||'-', o.subject||'-', o.involvedClass||'-', o.date||'-', o.severity, o.description, o.actionTaken||'-']);
+    pdf.setFontSize(16); pdf.text("Ocorrências de Professores - EREF Iva Ferreira", 14, 20);
+    pdf.setFontSize(10); pdf.text("Total: " + list.length + " | Gerado: " + new Date().toLocaleString('pt-BR'), 14, 28);
+    pdf.autoTable({ startY:35, head:[['Professor','Disciplina','Turma','Data','Gravidade','Descrição','Providência']], body:rows, headStyles:{fillColor:[217,119,6]} });
+    pdf.save('ocorrencias_professores.pdf');
+};
+
+
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+const USUARIOS = [
+    { usuario: 'thiago.nunes',       senha: '1306981020',      nome: 'Thiago Nunes',       foto: 'https://ui-avatars.com/api/?name=Thiago+Nunes&background=1e3a8a&color=fff' },
+    { usuario: 'michelle.herculano', senha: '81996996878',     nome: 'Michelle Herculano', foto: 'https://ui-avatars.com/api/?name=Michelle+Herculano&background=1e3a8a&color=fff' },
+    { usuario: 'coordenacao',        senha: 'ivaferreira2026', nome: 'Coordenação',        foto: 'https://ui-avatars.com/api/?name=Coordenacao&background=1e3a8a&color=fff' }
+];
+
+window.fazerLogin = function() {
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    const erro = document.getElementById('login-error');
+
+    const found = USUARIOS.find(u => u.usuario === user && u.senha === pass);
+    if (!found) {
+        erro.style.display = 'block';
+        document.getElementById('login-pass').value = '';
+        return;
+    }
+
+    erro.style.display = 'none';
+    currentUser = { uid: found.usuario, displayName: found.nome, photoURL: found.foto };
+    sessionStorage.setItem('pedagogico_session', JSON.stringify(currentUser));
+
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+    document.getElementById('user-name').textContent = found.nome;
+    document.getElementById('user-photo').src = found.foto;
+    lucide.createIcons();
+    navigateTo('dashboard');
+};
+
+window.fazerLogout = function() {
+    if (!confirm('Deseja sair do sistema?')) return;
+    sessionStorage.removeItem('pedagogico_session');
+    currentUser = { uid:'public-user', displayName:'Coordenador', photoURL:'' };
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('main-app').classList.add('hidden');
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-error').style.display = 'none';
+};
+
+// Tecla Enter no login
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !document.getElementById('login-screen').classList.contains('hidden')) {
+        window.fazerLogin();
+    }
+});
+
+// ── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
+window.toggleSidebar = () => {
+    const sidebar = document.querySelector('aside');
+    const overlay = document.getElementById('sidebar-overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('open');
+};
+window.closeSidebar = () => {
+    document.querySelector('aside')?.classList.remove('open');
+    document.getElementById('sidebar-overlay')?.classList.remove('open');
+};
+
+// Fechar sidebar no mobile ao navegar
+const _navOrig = navigateTo;
+window.navigateTo = (view) => {
+    _navOrig(view);
+    if (window.innerWidth < 768) window.closeSidebar();
+};
+
+
+</script>
+</body>
+</html>
